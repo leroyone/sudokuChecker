@@ -37,13 +37,15 @@ a[8][2] = 8
 
 ##############
 
-for each in
-
 for each in a:
     print each
 
 
 #### check if number not in column or row
+def initcheck(grid):
+    pass
+
+
 #### if not, add to list
 
 #### when complete, if len(list item) == 1, pop and insert into table
@@ -55,3 +57,26 @@ for each in a:
 
 #### list items in dict?
 #### list of list items?
+
+#### do something about box!!
+#### classes?? for each cell, containing column, row and box
+
+#### if len(column or row length) == 8, do something
+
+def checkColumn(num, col):
+    if num in a[col]:
+        return True
+    else:
+        return False
+
+def checkRow(num, row):
+    for each in a:
+        if num == each[row]:
+            return True
+    return False
+
+def checkBox():
+    pass
+
+print checkColumn(2,0)
+print checkRow(2,5)
