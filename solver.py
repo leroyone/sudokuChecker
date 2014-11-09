@@ -9,7 +9,7 @@ class cell():
     def updateNumVal(self,newNum):
         self.numval = newNum
 
-    def boxInit(self,grid):
+    def boxInit(self, grid):
         a = []
         x = (self.row / 3)*3
         y = (self.column / 3)*3
@@ -24,22 +24,34 @@ class cell():
             a.append(each.getNumVal())
         return a
 
+    def checkColumn(self, num, grid):
+        for each in grid[self.column]:
+            if num == each.getNumVal():
+                return True
+        return False
+
+    def checkRow(self, num, grid):
+        for each in grid:
+            if num == each[self.row].getNumVal():
+                return True
+        return False
+
     def getNumVal(self):
         return self.numval
 
+def gridInit():
+    a = []
+    for line in range(0,9):
+        b = []
+        for column in range(0,9):
+            b.append(cell(line, column, 0))
+        a.append(b)
+    for eachline in a:
+        for each in eachline:
+            each.boxInit(a)
+    return a
 
-
-a = []
-
-for line in range(0,9):
-    b = []
-    for column in range(0,9):
-        b.append(cell(line, column, 0))
-    a.append(b)
-
-for eachline in a:
-    for each in eachline:
-        each.boxInit(a)
+a = gridInit()
 
 ###### maker #####
 
@@ -69,19 +81,37 @@ a[8][1].updateNumVal(6)
 a[8][2].updateNumVal(8)
 
 ##############
-''' 
-for each in a:
-    ans = []
-    for every in each:
-        ans.append(every.getNumVal())
-    print ans
 
-#### check if number not in column or row
-def initcheck(grid):
-    pass
-'''
+def printGrid(grid):
+    for each in grid:
+        ans = []
+        for every in each:
+            ans.append(every.getNumVal())
+        print ans
 
-#### if not, add to list
+def initCheck(grid):
+    poss = []
+    for each in range(9):
+        b = []
+        for each in range(9):
+            b.append([])
+        poss.append(b)
+    for num in range(1,10):
+        lineCount = 0
+        for eachRow in grid:
+            colCount = 0
+            for every in eachRow:
+                if num not in every.getBox() and not every.checkColumn(num, grid) and not every.checkRow(num, grid):
+                    poss[lineCount][colCount].append(num)
+                colCount += 1
+            lineCount += 1
+    return poss
+
+printGrid(a)
+print initCheck(a)[5][6]
+#for each in initCheck(a):
+ #   for every in each:
+  #      print every
 
 #### when complete, if len(list item) == 1, pop and insert into table
 #### remove number from all list items in row and column
@@ -90,32 +120,4 @@ def initcheck(grid):
 
 #### if list item == [], ignore
 
-#### list items in dict?
-#### list of list items?
-
-#### do something about box!!
-#### classes?? for each cell, containing column, row and box
-
 #### if len(column or row length) == 8, do something
-''' 
-def checkColumn(num, col):
-    if num in a[col]:
-        return True
-    else:
-        return False
-
-def checkRow(num, row):
-    for each in a:
-        if num == each[row]:
-            return True
-    return False
-
-def checkBox():
-    pass
-
-print checkColumn(2,0)
-print checkRow(2,5)
-'''
-
-print a[0][7].getNumVal()
-print a[0][7].getBox()
