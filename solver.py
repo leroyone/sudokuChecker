@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python -B
 
 class cell():
     def __init__(self, row, column, numval):
@@ -51,37 +51,6 @@ def gridInit():
             each.boxInit(a)
     return a
 
-a = gridInit()
-
-###### maker #####
-
-a[0][6].updateNumVal(5)
-a[0][7].updateNumVal(2)
-a[1][3].updateNumVal(5)
-a[1][4].updateNumVal(3)
-a[2][1].updateNumVal(3)
-a[2][3].updateNumVal(4)
-a[2][4].updateNumVal(7)
-a[3][0].updateNumVal(1)
-a[3][1].updateNumVal(4)
-a[3][6].updateNumVal(2)
-a[4][2].updateNumVal(7)
-a[4][3].updateNumVal(1)
-a[4][5].updateNumVal(5)
-a[4][6].updateNumVal(6)
-a[5][2].updateNumVal(2)
-a[5][7].updateNumVal(7)
-a[5][8].updateNumVal(5)
-a[6][4].updateNumVal(4)
-a[6][5].updateNumVal(3)
-a[6][7].updateNumVal(8)
-a[7][4].updateNumVal(6)
-a[7][5].updateNumVal(7)
-a[8][1].updateNumVal(6)
-a[8][2].updateNumVal(8)
-
-##############
-
 def printGrid(grid):
     for each in grid:
         ans = []
@@ -107,7 +76,6 @@ def makePoss(grid):
             lineCount += 1
     return poss
 
-
 def checkPoss(grid):
     test = True
     while test == True:
@@ -124,6 +92,13 @@ def checkPoss(grid):
                 colCount += 1
             rowCount += 1
 
+#### setup a sample puzzle ####
+a = gridInit()
+import examples
+examples.example1(a)
+###############################
+
+printGrid(a)
 checkPoss(a)
 
 #### when complete, if len(list item) == 1, pop and insert into table
