@@ -89,7 +89,7 @@ def printGrid(grid):
             ans.append(every.getNumVal())
         print ans
 
-def initCheck(grid):
+def makePoss(grid):
     poss = []
     for each in range(9):
         b = []
@@ -101,17 +101,30 @@ def initCheck(grid):
         for eachRow in grid:
             colCount = 0
             for every in eachRow:
-                if num not in every.getBox() and not every.checkColumn(num, grid) and not every.checkRow(num, grid):
+                if every.getNumVal() == 0 and num not in every.getBox() and not every.checkColumn(num, grid) and not every.checkRow(num, grid):
                     poss[lineCount][colCount].append(num)
                 colCount += 1
             lineCount += 1
     return poss
 
-printGrid(a)
-print initCheck(a)[5][6]
-#for each in initCheck(a):
- #   for every in each:
-  #      print every
+
+def checkPoss(grid):
+    test = True
+    while test == True:
+        f = makePoss(grid)
+        test = False
+        rowCount = 0
+        for each in f:
+            colCount = 0
+            for every in each:
+                if len(every) == 1:
+                    test = True
+                    grid[rowCount][colCount].updateNumVal(every.pop())
+                    print 'Grid changed!!'
+                colCount += 1
+            rowCount += 1
+
+checkPoss(a)
 
 #### when complete, if len(list item) == 1, pop and insert into table
 #### remove number from all list items in row and column
