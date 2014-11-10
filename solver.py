@@ -1,6 +1,8 @@
 #!/usr/bin/python -B
 
 class cell():
+    POSS = None
+
     def __init__(self, row, column, numval):
         self.column = column
         self.row = row
@@ -74,32 +76,83 @@ def makePoss(grid):
                     poss[lineCount][colCount].append(num)
                 colCount += 1
             lineCount += 1
-    return poss
+    cell.POSS = poss
 
 def checkPoss(grid):
     test = True
     while test == True:
-        f = makePoss(grid)
         test = False
         rowCount = 0
-        for each in f:
+        for each in cell.POSS:
             colCount = 0
             for every in each:
                 if len(every) == 1:
                     test = True
                     grid[rowCount][colCount].updateNumVal(every.pop())
-                    print 'Grid changed!!'
                 colCount += 1
             rowCount += 1
+        if test == True:
+            makePoss(grid)
+
+def basicRowFind(num, gridRow, grid):
+    a = [[]]
+    for aBox in range(3):
+        theBox = grid[gridRow*3][aBox*3].getBox()
+        a[0].append(num in theBox)
+        a.append(theBox)
+    if sum(a[0]) == 2:
+        ### check remaining box for 2 of 3 (update grid and poss)
+        boxToCheck = a[0].index(False)
+        goodBoxes = [0,1,2]
+        goodBoxes.remove(boxToCheck)
+        x = [0,1,2]
+        a.pop(0)
+        for each in goodBoxes:
+            x.remove((a[each].index(num))/3)
+        x = x[0]
+        rowToCheck = a[boxToCheck][x*3:x*3+3]
+        if rowToCheck.count(0) == 1:
+            grid[gridRow*3+x][boxToCheck*3+rowToCheck.index(0)].updateNumVal(num)
+            makePoss(grid)
+            return
+            ### if not
+            ### check poss (update grid and poss)
+                ### maybe if not, check adjacent or return fail message?
+
+def basicColFind(num, gridCol, grid):
+    a = [[]]
+    for aBox in range(3):
+        theBox = grid[aBox*3][gridCol*3].getBox()
+        a[0].append(num in theBox)
+        a.append(theBox)
+    if sum(a[0]) == 2:
+        pass
+        ### check remaining box for 2 of 3 (update grid and poss)
+            ### if not
+            ### check poss (update grid and poss)
+                ### maybe if not, check adjacent or return fail message?
+
+
+def basicNextStep(num, grid):
+    pass
+
+#### make change checker
+
+def loopit(grid):
+    for eachNum in range(1,10):
+        for eachRow in range(3):
+            basicRowFind(eachNum,eachRow,grid)
 
 #### setup a sample puzzle ####
 a = gridInit()
 import examples
 examples.example1(a)
-###############################
-
+makePoss(a)
 printGrid(a)
-checkPoss(a)
+loopit(a)
+print
+printGrid(a)
+###############################
 
 #### when complete, if len(list item) == 1, pop and insert into table
 #### remove number from all list items in row and column
