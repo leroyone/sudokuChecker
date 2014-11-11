@@ -3,22 +3,31 @@
 class cell():
     POSS = None
 
-    def __init__(self, row, column, numval):
-        self.column = column
+    def __init__(self, row, col, numval):
+        self.col = col
         self.row = row
         self.numval = numval
 
-    def updateNumVal(self,newNum):
+    def updateNumVal(self, newNum):
         self.numval = newNum
 
     def boxInit(self, grid):
         a = []
         x = (self.row / 3)*3
-        y = (self.column / 3)*3
+        y = (self.col / 3)*3
         for rownum in range(x, x+3):
             for colnum in range(y, y+3):
                 a.append(grid[rownum][colnum])
         self.box = a
+
+    def colInit(self, grid):
+        a = []
+        for eachLine in grid:
+            a.append(eachLine[self.col])
+        self.colList = a
+
+    def rowInit(self, grid):
+        self.rowList = grid[self.row]
 
     def getBox(self):
         a = []
@@ -26,17 +35,17 @@ class cell():
             a.append(each.getNumVal())
         return a
 
-    def checkColumn(self, num, grid):
-        for each in grid[self.column]:
-            if num == each.getNumVal():
-                return True
-        return False
+    def getCol(self):
+        a = []
+        for each in self.colList:
+            a.append(each.getNumVal())
+        return a
 
-    def checkRow(self, num, grid):
-        for each in grid:
-            if num == each[self.row].getNumVal():
-                return True
-        return False
+    def getRow(self):
+        a = []
+        for each in self.rowList:
+            a.append(each.getNumVal())
+        return a
 
     def getNumVal(self):
         return self.numval
@@ -45,12 +54,14 @@ def gridInit():
     a = []
     for line in range(0,9):
         b = []
-        for column in range(0,9):
-            b.append(cell(line, column, 0))
+        for col in range(0,9):
+            b.append(cell(line, col, 0))
         a.append(b)
     for eachline in a:
         for each in eachline:
             each.boxInit(a)
+            each.colInit(a)
+            each.rowInit(a)
     return a
 
 def printGrid(grid):
@@ -72,7 +83,7 @@ def makePoss(grid):
         for eachRow in grid:
             colCount = 0
             for every in eachRow:
-                if every.getNumVal() == 0 and num not in every.getBox() and not every.checkColumn(num, grid) and not every.checkRow(num, grid):
+                if every.getNumVal() == 0 and num not in every.getBox() and num not in every.getCol() and num not in every.getRow():
                     poss[lineCount][colCount].append(num)
                 colCount += 1
             lineCount += 1
@@ -109,7 +120,7 @@ def basicRowFind(num, gridRow, grid):
         a.pop(0)
         for each in goodBoxes:
             x.remove((a[each].index(num))/3)
-        x = x[0]
+        x = x[0] ### x is the row without the num
         rowToCheck = a[boxToCheck][x*3:x*3+3]
         if rowToCheck.count(0) == 1:
             grid[gridRow*3+x][boxToCheck*3+rowToCheck.index(0)].updateNumVal(num)
@@ -126,32 +137,63 @@ def basicColFind(num, gridCol, grid):
         a[0].append(num in theBox)
         a.append(theBox)
     if sum(a[0]) == 2:
-        pass
         ### check remaining box for 2 of 3 (update grid and poss)
+        boxToCheck = a[0].index(False)
+        goodBoxes = [0,1,2]
+        goodBoxes.remove(boxToCheck)
+        x = [0,1,2]
+        a.pop(0)
+        for each in goodBoxes:
+            x.remove((a[each].index(num))%3)
+        x = x[0] ### x is the col without the num
+        colToCheck = a[boxToCheck][x::3]
+        if colToCheck.count(0) == 1:
+            grid[boxToCheck*3+colToCheck.index(0)][gridCol*3+x].updateNumVal(num)
+            makePoss(grid)
+            return
             ### if not
             ### check poss (update grid and poss)
                 ### maybe if not, check adjacent or return fail message?
-
 
 def basicNextStep(num, grid):
     pass
 
 #### make change checker
 
-def loopit(grid):
+def loopRow(grid):
     for eachNum in range(1,10):
         for eachRow in range(3):
             basicRowFind(eachNum,eachRow,grid)
+
+def loopCol(grid):
+    for eachNum in range(1,10):
+        for eachCol in range(3):
+            basicColFind(eachNum,eachCol,grid)
+
+def loopBoth(grid):
+    loopRow(grid)
+    loopCol(grid)
 
 #### setup a sample puzzle ####
 a = gridInit()
 import examples
 examples.example1(a)
 makePoss(a)
-printGrid(a)
-loopit(a)
+printGrid(a)    #####  check check.row() and check.column() !!!
+
+for each in range(1):
+    loopBoth(a)
+    print
+    printGrid(a)
+
+for each in cell.POSS:
+    print each
+
+''' 
 print
+checkPoss(a) ####### MAKEPOSS() IS WRONG!!
 printGrid(a)
+'''
 ###############################
 
 #### when complete, if len(list item) == 1, pop and insert into table
