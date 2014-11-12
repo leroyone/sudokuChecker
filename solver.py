@@ -90,6 +90,7 @@ def makePoss(grid):
     cell.POSS = poss
 
 def checkPoss(grid):
+    makePoss(grid)
     test = True
     while test == True:
         test = False
@@ -124,11 +125,14 @@ def basicRowFind(num, gridRow, grid):
         rowToCheck = a[boxToCheck][x*3:x*3+3]
         if rowToCheck.count(0) == 1:
             grid[gridRow*3+x][boxToCheck*3+rowToCheck.index(0)].updateNumVal(num)
-            makePoss(grid)
-            return
-            ### if not
-            ### check poss (update grid and poss)
-                ### maybe if not, check adjacent or return fail message?
+        elif rowToCheck.count(0) == 2:
+            y = grid[gridRow*3+x][boxToCheck*3:(boxToCheck*3)+3] ### 3 instances
+            a = []
+            for each in y:
+                if num not in each.getCol() and each.getNumVal() == 0:
+                    a.append(each)
+            if len(a) == 1:
+                a[0].updateNumVal(num)
 
 def basicColFind(num, gridCol, grid):
     a = [[]]
@@ -149,16 +153,8 @@ def basicColFind(num, gridCol, grid):
         colToCheck = a[boxToCheck][x::3]
         if colToCheck.count(0) == 1:
             grid[boxToCheck*3+colToCheck.index(0)][gridCol*3+x].updateNumVal(num)
-            makePoss(grid)
-            return
-            ### if not
-            ### check poss (update grid and poss)
-                ### maybe if not, check adjacent or return fail message?
 
-def basicNextStep(num, grid):
-    pass
-
-#### make change checker
+#############
 
 def loopRow(grid):
     for eachNum in range(1,10):
@@ -179,27 +175,15 @@ a = gridInit()
 import examples
 examples.example1(a)
 makePoss(a)
-printGrid(a)    #####  check check.row() and check.column() !!!
-
-for each in range(1):
-    loopBoth(a)
-    print
-    printGrid(a)
-
-for each in cell.POSS:
-    print each
-
-''' 
-print
-checkPoss(a) ####### MAKEPOSS() IS WRONG!!
 printGrid(a)
-'''
+print
+for each in range(3):
+    loopBoth(a)
+    printGrid(a)
+    print
+
+
 ###############################
-
-#### when complete, if len(list item) == 1, pop and insert into table
-#### remove number from all list items in row and column
-
-#### wash, rinse, repeat
 
 #### if list item == [], ignore
 
