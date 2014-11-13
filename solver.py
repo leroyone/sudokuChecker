@@ -20,6 +20,9 @@ class cell():
                 a.append(grid[rownum][colnum])
         self.box = a
 
+    def getRawBox(self):
+        return self.box
+
     def colInit(self, grid):
         a = []
         for eachLine in grid:
@@ -153,6 +156,31 @@ def basicColFind(num, gridCol, grid):
         colToCheck = a[boxToCheck][x::3]
         if colToCheck.count(0) == 1:
             grid[boxToCheck*3+colToCheck.index(0)][gridCol*3+x].updateNumVal(num)
+        elif colToCheck.count(0) == 2:
+            y = []
+            for each in range(3):
+                y.append(grid[boxToCheck*3+each][gridCol*3+x])
+            a = []
+            for each in y:
+                if num not in each.getRow() and each.getNumVal() == 0:
+                    a.append(each)
+            if len(a) == 1:
+                a[0].updateNumVal(num)
+
+def boxPossCheck(grid):
+    makePoss(grid)
+    for boxRow in range(3):
+        for boxCol in range(3):
+            possGridBox = ''
+            for each in range(3):
+                    for every in range(3):
+                        possGridBox += str(cell.POSS[boxRow*3+each][boxCol*3+every]).strip('[').strip(']') + ',(' + str(each*3+every) + ')'
+            for eachNum in range(1,10):
+                if possGridBox.count(str(eachNum)+',') == 1:
+                    a = possGridBox[possGridBox.index(str(eachNum)+','):]
+                    b = int(a[a.index('(')+1])
+                    grid[boxRow*3+b/3][boxCol*3+b%3].updateNumVal(eachNum)
+                    makePoss(grid)
 
 #############
 
@@ -177,12 +205,17 @@ examples.example1(a)
 makePoss(a)
 printGrid(a)
 print
+
+for each in range(10):
+    boxPossCheck(a)
+    printGrid(a)
+    print
+''' 
 for each in range(3):
     loopBoth(a)
     printGrid(a)
     print
-
-
+'''
 ###############################
 
 #### if list item == [], ignore
