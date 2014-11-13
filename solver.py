@@ -20,8 +20,11 @@ class cell():
                 a.append(grid[rownum][colnum])
         self.box = a
 
+    #### not needed?
+    ''' 
     def getRawBox(self):
         return self.box
+    '''
 
     def colInit(self, grid):
         a = []
@@ -109,6 +112,8 @@ def checkPoss(grid):
         if test == True:
             makePoss(grid)
 
+### not needed?
+''' 
 def basicRowFind(num, gridRow, grid):
     a = [[]]
     for aBox in range(3):
@@ -136,7 +141,10 @@ def basicRowFind(num, gridRow, grid):
                     a.append(each)
             if len(a) == 1:
                 a[0].updateNumVal(num)
+'''
 
+### not needed?
+''' 
 def basicColFind(num, gridCol, grid):
     a = [[]]
     for aBox in range(3):
@@ -166,6 +174,7 @@ def basicColFind(num, gridCol, grid):
                     a.append(each)
             if len(a) == 1:
                 a[0].updateNumVal(num)
+'''
 
 def boxPossCheck(grid):
     makePoss(grid)
@@ -182,8 +191,23 @@ def boxPossCheck(grid):
                     grid[boxRow*3+b/3][boxCol*3+b%3].updateNumVal(eachNum)
                     makePoss(grid)
 
-#############
 
+#############
+def loopOne(grid):
+    while True:
+        checker = cell.POSS[:]
+        boxPossCheck(grid)
+        if cell.POSS == checker:
+            break
+
+def loopTwo(grid):
+    while True:
+        checker = cell.POSS[:]
+        checkPoss(grid)
+        if cell.POSS == checker:
+            break
+
+''' 
 def loopRow(grid):
     for eachNum in range(1,10):
         for eachRow in range(3):
@@ -197,25 +221,26 @@ def loopCol(grid):
 def loopBoth(grid):
     loopRow(grid)
     loopCol(grid)
-
+'''
 #### setup a sample puzzle ####
 a = gridInit()
 import examples
-examples.example1(a)
+examples.example3(a)
 makePoss(a)
 printGrid(a)
 print
 
-for each in range(10):
-    boxPossCheck(a)
-    printGrid(a)
-    print
-''' 
-for each in range(3):
-    loopBoth(a)
-    printGrid(a)
-    print
-'''
+while True:
+    checker = cell.POSS[:]
+    loopOne(a)
+    loopTwo(a)
+    if cell.POSS == checker:
+        printGrid(a)
+        break
+
+for each in cell.POSS:
+    print each
+
 ###############################
 
 #### if list item == [], ignore
