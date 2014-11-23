@@ -139,8 +139,6 @@ def updatePoss(num, target, without):
     elif target[0] == 'b':
         boxRow = range(x/3*3,x/3*3+3)
         boxCol = range(x%3*3,x%3*3+3)
-        print boxRow
-        print boxCol
         count = 0
         for eachRow in boxRow:
             for eachCol in boxCol:
@@ -148,16 +146,61 @@ def updatePoss(num, target, without):
                     cell.POSS[eachRow][eachCol].remove(num)
                 count += 1
 
+##############################################################################################################################################
 
-def numInRowOne():
-    for possRow in cell.POSS:
-        pass
+def rowStr(row):
+    ''' 
+    row: int representing row
+    returns that row as a string with number delimiters
+    '''
+    ans = ''
+    cellNum = 0
+    for eachCell in cell.POSS[row]:
+        ans += str(eachCell).strip(']') + ', ]' + str(cellNum)
+        cellNum += 1
+    return ans
 
+def colStr(col):
+    ''' 
+    col: int representing col
+    returns that col as a string with number delimiters
+    '''
+    ans = ''
+    cellNum = 0
+    for eachRow in cell.POSS:
+        ans += str(eachRow[col]).strip(']') + ', ]' + str(cellNum)
+        cellNum += 1
+    return ans
 
+def numInRowOne(num, grid):
+    ''' 
+    num: int
+    If number occurs once only in row, gridCell, col and box updated
+    '''
+    numCheck = str(num)+','
+    for possRow in range(9):
+        check = rowStr(possRow)
+        if check.count(numCheck) == 1:
+            col = int(check[check.index(']',check.index(numCheck))+1])
+            cell.POSS[possRow][col] = []
+            grid[possRow][col].updateNumVal(num)
+            updatePoss(num, 'c'+str(col), [possRow])
+            updatePoss(num, 'b'+str((possRow/3*3)+col/3), [(possRow%3*3)+((col%3*3)/3)])
 
-
-
-
+def numInColOne(num, grid):
+    ''' 
+    num: int
+    If number occurs once only in col, gridCell, row and box updated
+    '''
+    numCheck = str(num)+','
+    for possCol in range(9):
+        check = colStr(possCol)
+        if check.count(numCheck) == 1:
+            row = int(check[check.index(']',check.index(numCheck))+1])
+            cell.POSS[row][possCol] = []
+            grid[row][possCol].updateNumVal(num)
+            updatePoss(num, 'r'+str(row), [possCol])
+            updatePoss(num, 'b'+str((row/3*3)+possCol/3), [(col%3*3)+((possCol%3*3)/3)])
 
 
 
@@ -187,7 +230,7 @@ for each in cell.POSS:
     print each
 print
 
-updatePoss(5,'b1',[1])
+numInColOne(4,a)
 
 for each in cell.POSS:
     print each
