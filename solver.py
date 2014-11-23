@@ -20,7 +20,7 @@ class cell():
                 a.append(grid[rownum][colnum])
         self.box = a
 
-    #### not needed?
+   #### not needed?
     ''' 
     def getRawBox(self):
         return self.box
@@ -95,7 +95,7 @@ def makePoss(grid):
             lineCount += 1
     cell.POSS = poss
 
-
+''' 
 def boxPossCheck(grid):
     makePoss(grid) #replace with cell.POSS
     for boxRow in range(3):
@@ -110,6 +110,7 @@ def boxPossCheck(grid):
                     b = int(a[a.index('(')+1])
                     grid[boxRow*3+b/3][boxCol*3+b%3].updateNumVal(eachNum)
                     makePoss(grid) #replace with ...something??
+'''
 
 ##############################################################################################################################################
 
@@ -146,8 +147,6 @@ def updatePoss(num, target, without):
                     cell.POSS[eachRow][eachCol].remove(num)
                 count += 1
 
-##############################################################################################################################################
-
 def rowStr(row):
     ''' 
     row: int representing row
@@ -172,10 +171,25 @@ def colStr(col):
         cellNum += 1
     return ans
 
+def boxStr(box):
+    ''' 
+    box: int representing box
+    returns that box as a string with number delimeters
+    '''
+    ans = ''
+    cellNum = 0
+    for eachRow in range(3):
+        for eachCol in range(3):
+            ans += str(cell.POSS[eachRow+(box/3*3)][eachCol+(box%3*3)]).strip(']') + ', ]' + str(cellNum)
+            cellNum += 1
+    return ans
+
+##############################################################################################################################################
+
 def numInRowOne(num, grid):
     ''' 
     num: int
-    If number occurs once only in row, gridCell, col and box updated
+    If number occurs once only in row: grid, cell, col and box updated
     '''
     numCheck = str(num)+','
     for possRow in range(9):
@@ -190,7 +204,7 @@ def numInRowOne(num, grid):
 def numInColOne(num, grid):
     ''' 
     num: int
-    If number occurs once only in col, gridCell, row and box updated
+    If number occurs once only in col: grid, cell, row and box updated
     '''
     numCheck = str(num)+','
     for possCol in range(9):
@@ -200,9 +214,24 @@ def numInColOne(num, grid):
             cell.POSS[row][possCol] = []
             grid[row][possCol].updateNumVal(num)
             updatePoss(num, 'r'+str(row), [possCol])
-            updatePoss(num, 'b'+str((row/3*3)+possCol/3), [(col%3*3)+((possCol%3*3)/3)])
+            updatePoss(num, 'b'+str((row/3*3)+possCol/3), [(row%3*3)+((possCol%3*3)/3)])
 
-
+def numInBoxOne(num, grid):
+    ''' 
+    num: int
+    If number occurs one only in box: grid, cell, row and col updated
+    '''
+    numCheck = str(num)+','
+    for box in range(9):
+        check = boxStr(box)
+        if check.count(numCheck) == 1:
+            boxCell = int(check[check.index(']',check.index(numCheck))+1])
+            row = box/3*3 + boxCell/3
+            col = box%3*3 + boxCell%3
+            cell.POSS[row][col] = []
+            grid[row][col].updateNumVal(num)
+            updatePoss(num, 'r'+str(row), [col])
+            updatePoss(num, 'c'+str(col), [row])
 
 ##############################################################################################################################################
 
@@ -230,11 +259,13 @@ for each in cell.POSS:
     print each
 print
 
-numInColOne(4,a)
+numInBoxOne(2,a)
 
 for each in cell.POSS:
     print each
 print
+
+printGrid(a)
 
 ###############################
 
