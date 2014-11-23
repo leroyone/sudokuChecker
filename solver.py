@@ -95,89 +95,9 @@ def makePoss(grid):
             lineCount += 1
     cell.POSS = poss
 
-def checkPoss(grid):
-    makePoss(grid)
-    test = True
-    while test == True:
-        test = False
-        rowCount = 0
-        for each in cell.POSS:
-            colCount = 0
-            for every in each:
-                if len(every) == 1:
-                    test = True
-                    grid[rowCount][colCount].updateNumVal(every.pop())
-                colCount += 1
-            rowCount += 1
-        if test == True:
-            makePoss(grid)
-
-### not needed?
-''' 
-def basicRowFind(num, gridRow, grid):
-    a = [[]]
-    for aBox in range(3):
-        theBox = grid[gridRow*3][aBox*3].getBox()
-        a[0].append(num in theBox)
-        a.append(theBox)
-    if sum(a[0]) == 2:
-        ### check remaining box for 2 of 3 (update grid and poss)
-        boxToCheck = a[0].index(False)
-        goodBoxes = [0,1,2]
-        goodBoxes.remove(boxToCheck)
-        x = [0,1,2]
-        a.pop(0)
-        for each in goodBoxes:
-            x.remove((a[each].index(num))/3)
-        x = x[0] ### x is the row without the num
-        rowToCheck = a[boxToCheck][x*3:x*3+3]
-        if rowToCheck.count(0) == 1:
-            grid[gridRow*3+x][boxToCheck*3+rowToCheck.index(0)].updateNumVal(num)
-        elif rowToCheck.count(0) == 2:
-            y = grid[gridRow*3+x][boxToCheck*3:(boxToCheck*3)+3] ### 3 instances
-            a = []
-            for each in y:
-                if num not in each.getCol() and each.getNumVal() == 0:
-                    a.append(each)
-            if len(a) == 1:
-                a[0].updateNumVal(num)
-'''
-
-### not needed?
-''' 
-def basicColFind(num, gridCol, grid):
-    a = [[]]
-    for aBox in range(3):
-        theBox = grid[aBox*3][gridCol*3].getBox()
-        a[0].append(num in theBox)
-        a.append(theBox)
-    if sum(a[0]) == 2:
-        ### check remaining box for 2 of 3 (update grid and poss)
-        boxToCheck = a[0].index(False)
-        goodBoxes = [0,1,2]
-        goodBoxes.remove(boxToCheck)
-        x = [0,1,2]
-        a.pop(0)
-        for each in goodBoxes:
-            x.remove((a[each].index(num))%3)
-        x = x[0] ### x is the col without the num
-        colToCheck = a[boxToCheck][x::3]
-        if colToCheck.count(0) == 1:
-            grid[boxToCheck*3+colToCheck.index(0)][gridCol*3+x].updateNumVal(num)
-        elif colToCheck.count(0) == 2:
-            y = []
-            for each in range(3):
-                y.append(grid[boxToCheck*3+each][gridCol*3+x])
-            a = []
-            for each in y:
-                if num not in each.getRow() and each.getNumVal() == 0:
-                    a.append(each)
-            if len(a) == 1:
-                a[0].updateNumVal(num)
-'''
 
 def boxPossCheck(grid):
-    makePoss(grid)
+    makePoss(grid) #replace with cell.POSS
     for boxRow in range(3):
         for boxCol in range(3):
             possGridBox = ''
@@ -189,39 +109,60 @@ def boxPossCheck(grid):
                     a = possGridBox[possGridBox.index(str(eachNum)+','):]
                     b = int(a[a.index('(')+1])
                     grid[boxRow*3+b/3][boxCol*3+b%3].updateNumVal(eachNum)
-                    makePoss(grid)
+                    makePoss(grid) #replace with ...something??
+
+##############################################################################################################################################
+
+def updatePoss(num, target, without):
+    ''' 
+    num: number to be removed from other cells
+    target: string, letter(r,c,b) and number(0-9) pertaining to which to update
+    without: list telling which rows or columns to ignore
+    Removes the number from all adjacent Cells and Box if True
+    '''
+    try:
+        x = int(target[1])
+    except:
+        print 'Probably incorrect input here'
+        return
+    #rows
+    if target[0] == 'r':
+        for eachCell in range(9):
+            if eachCell not in without and num in cell.POSS[x][eachCell]:
+                cell.POSS[x][eachCell].remove(num)
+    #cols
+    elif target[0] == 'c':
+        for eachCell in range(9):
+            if eachCell not in without and num in cell.POSS[eachCell][x]:
+                cell.POSS[eachCell][x].remove(num)
+    #boxes
+    elif target[0] == 'b':
+        boxRow = range(x/3*3,x/3*3+3)
+        boxCol = range(x%3*3,x%3*3+3)
+        print boxRow
+        print boxCol
+        count = 0
+        for eachRow in boxRow:
+            for eachCol in boxCol:
+                if num in cell.POSS[eachRow][eachCol] and count not in without:
+                    cell.POSS[eachRow][eachCol].remove(num)
+                count += 1
 
 
-#############
-def loopOne(grid):
-    while True:
-        checker = cell.POSS[:]
-        boxPossCheck(grid)
-        if cell.POSS == checker:
-            break
+def numInRowOne():
+    for possRow in cell.POSS:
+        pass
 
-def loopTwo(grid):
-    while True:
-        checker = cell.POSS[:]
-        checkPoss(grid)
-        if cell.POSS == checker:
-            break
 
-''' 
-def loopRow(grid):
-    for eachNum in range(1,10):
-        for eachRow in range(3):
-            basicRowFind(eachNum,eachRow,grid)
 
-def loopCol(grid):
-    for eachNum in range(1,10):
-        for eachCol in range(3):
-            basicColFind(eachNum,eachCol,grid)
 
-def loopBoth(grid):
-    loopRow(grid)
-    loopCol(grid)
-'''
+
+
+
+
+
+##############################################################################################################################################
+
 #### setup a sample puzzle ####
 a = gridInit()
 import examples
@@ -230,19 +171,28 @@ makePoss(a)
 printGrid(a)
 print
 
+''' 
 while True:
     checker = cell.POSS[:]
-    loopOne(a)
     loopTwo(a)
+    loopOne(a)
     if cell.POSS == checker:
         printGrid(a)
         break
 
+print
+checkPossSpecial(a)
+'''
 for each in cell.POSS:
     print each
+print
+
+updatePoss(5,'b1',[1])
+
+for each in cell.POSS:
+    print each
+print
 
 ###############################
-
-#### if list item == [], ignore
 
 #### if len(column or row length) == 8, do something
