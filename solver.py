@@ -2,7 +2,7 @@
 
 class cell():
     POSS = None
-
+    THECACHE = []
     def __init__(self, row, col, numval):
         self.col = col
         self.row = row
@@ -95,23 +95,6 @@ def makePoss(grid):
             lineCount += 1
     cell.POSS = poss
 
-''' 
-def boxPossCheck(grid):
-    makePoss(grid) #replace with cell.POSS
-    for boxRow in range(3):
-        for boxCol in range(3):
-            possGridBox = ''
-            for each in range(3):
-                    for every in range(3):
-                        possGridBox += str(cell.POSS[boxRow*3+each][boxCol*3+every]).strip('[').strip(']') + ',(' + str(each*3+every) + ')'
-            for eachNum in range(1,10):
-                if possGridBox.count(str(eachNum)+',') == 1:
-                    a = possGridBox[possGridBox.index(str(eachNum)+','):]
-                    b = int(a[a.index('(')+1])
-                    grid[boxRow*3+b/3][boxCol*3+b%3].updateNumVal(eachNum)
-                    makePoss(grid) #replace with ...something??
-'''
-
 ##############################################################################################################################################
 
 def updatePoss(num, target, without):
@@ -146,6 +129,8 @@ def updatePoss(num, target, without):
                 if num in cell.POSS[eachRow][eachCol] and count not in without:
                     cell.POSS[eachRow][eachCol].remove(num)
                 count += 1
+
+##############################################################################################################################################
 
 def rowStr(row):
     ''' 
@@ -183,6 +168,24 @@ def boxStr(box):
             ans += str(cell.POSS[eachRow+(box/3*3)][eachCol+(box%3*3)]).strip(']') + ', ]' + str(cellNum)
             cellNum += 1
     return ans
+
+def cacheIt(subject, locality, toCache):
+    ''' 
+    subject: str, name of function
+    index: int
+    toCache: str, particular cell
+    '''
+    cell.THECACHE.append(subject + str(locality) + str(toCache))
+
+
+def cacheCheck(subject, locality, toCheck):
+    ''' 
+    subject: str, name of function
+    index: int
+    toCache: str, particular cell
+    '''
+    a = subject + str(locality) + str(toCheck)
+    return a not in cell.THECACHE
 
 ##############################################################################################################################################
 
@@ -233,7 +236,94 @@ def numInBoxOne(num, grid):
             updatePoss(num, 'r'+str(row), [col])
             updatePoss(num, 'c'+str(col), [row])
 
+def numInRowTwoThreeFour(num, grid): ### To Do!!
+    ''' 
+    '''
+    pass
+
 ##############################################################################################################################################
+
+def lenCellOne(grid):
+    ''' 
+    if any cell length is 1: grid, cell, row, col and box updated
+    '''
+    for row in range(9):
+        for col in range(9):
+            if len(cell.POSS[row][col]) == 1:
+                num = cell.POSS[row][col][0]
+                grid[row][col].updateNumVal(num)
+                updatePoss(num, 'r'+str(row), [col])
+                updatePoss(num, 'c'+str(col), [row])
+                updatePoss(num, 'b'+str((row/3*3)+col/3), [(row%3*3)+((col%3*3)/3)])
+                cell.POSS[row][col] = []
+
+def lenRowTwo():
+    ''' 
+    if two identical cells in row have len2: update row ### Maybe cache this?? ##################################
+    '''
+    for row in range(9):
+        for col in cell.POSS[row]:
+            if len(col) == 2:
+                a = col # the pair cell
+                if cell.POSS[row].count(a) == 2 and cacheCheck('lenRowTwo', row, a):
+                    x = cell.POSS[row].index(a) # index of first pair
+                    without = [x, cell.POSS[row].index(a,x+1)]
+                    cacheIt('lenRowTwo', row, a)
+                    for eachNum in a:
+                        updatePoss(eachNum, 'r'+str(row), without)
+
+def lenColTwo(grid): ### To Do!!
+    ''' 
+    if two identical cells in col have len2: update col
+    '''
+    pass
+
+def lenBoxTwo(grid): ### To Do!!
+    ''' 
+    if two identical cells in box have len2: update box
+    '''
+    pass
+
+########## and threes?, fours?, etc?
+
+##############################################################################################################################################
+
+def lenRowTwoThree(grid): ### To Do!!
+    ''' 
+    if not lenRowTwo()
+    if len2 cel numbers in two identical len3 cells: remove 3rd from row
+    if len3 cells in same box: remove 3rd from box
+    '''
+    pass
+
+def lenColTwoThree(grid): ### To Do!!
+    ''' 
+    if not lenColTwo()
+    if len2 cel numbers in two identical len3 cells: remove 3rd from col
+    if len3 cells in same box: remove 3rd from box
+    '''
+    pass
+
+def lenBoxTwoThree(grid): ### To Do!!
+    ''' 
+    if not lenBoxTwo()
+    if len2 cel numbers in two identical len3 cells: remove 3rd from box
+    if len3 cells in same row or col: remove 3rd from row or col
+    '''
+    pass
+
+##############################################################################################################################################
+
+def looper(numberOfLoops):
+    for each in range(numberOfLoops):
+        for every in range(1,10):
+            numInRowOne(every, a)
+            numInColOne(every, a)
+            numInBoxOne(every, a)
+        lenCellOne(a)
+        lenRowTwo()
+        printGrid(a)
+        print
 
 #### setup a sample puzzle ####
 a = gridInit()
@@ -242,6 +332,7 @@ examples.example3(a)
 makePoss(a)
 printGrid(a)
 print
+###############################
 
 ''' 
 while True:
@@ -259,14 +350,10 @@ for each in cell.POSS:
     print each
 print
 
-numInBoxOne(2,a)
+looper(5)
 
 for each in cell.POSS:
     print each
 print
 
-printGrid(a)
-
-###############################
-
-#### if len(column or row length) == 8, do something
+print cell.THECACHE
