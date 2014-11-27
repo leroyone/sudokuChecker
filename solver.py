@@ -3,6 +3,7 @@
 class cell():
     POSS = None
     THECACHE = []
+
     def __init__(self, row, col, numval):
         self.col = col
         self.row = row
@@ -187,6 +188,42 @@ def cacheCheck(subject, locality, toCheck):
     a = subject + str(locality) + str(toCheck)
     return a not in cell.THECACHE
 
+def colList(col):
+    ''' 
+    returns a list of cells in a column
+    '''
+    ans = []
+    for eachRow in cell.POSS:
+        ans.append(eachRow[col])
+    return ans
+
+def rowColtoBox(row, col):
+    ''' 
+    returns box number from cell row and col
+    '''
+    return row/3*3+col/3
+
+def boxCellToRow(box, boxCell):
+    ''' 
+    returns cell row from box cell
+    '''
+    return box/3*3+boxCell/3
+
+def boxCellToCol(box, boxCell):
+    ''' 
+    returns cell col from boxx cell
+    '''
+    return box%3*3+boxCell%3
+
+def boxList(box):
+    ''' 
+    returns a list of cells inn a box
+    '''
+    ans = []
+    for eachRow in cell.POSS[box/3*3:box/3*3+3]:
+        ans += eachRow[box%3*3:box%3*3+3]
+    return ans
+
 ##############################################################################################################################################
 
 def numInRowOne(num, grid):
@@ -259,7 +296,7 @@ def lenCellOne(grid):
 
 def lenRowTwo():
     ''' 
-    if two identical cells in row have len2: update row ### Maybe cache this?? ##################################
+    if two identical cells in row have len2: update row
     '''
     for row in range(9):
         for col in cell.POSS[row]:
@@ -272,29 +309,69 @@ def lenRowTwo():
                     for eachNum in a:
                         updatePoss(eachNum, 'r'+str(row), without)
 
-def lenColTwo(grid): ### To Do!!
+def lenColTwo():
     ''' 
     if two identical cells in col have len2: update col
     '''
-    pass
+    for eachCol in range(9):
+        col = colList(eachCol)
+        for row in col:
+            if len(row) == 2:
+                a = row #the pair cell
+                if col.count(a) == 2 and cacheCheck('lenColTwo', eachCol, a):
+                    x = col.index(a) #index of first pair
+                    without = [x, col.index(a,x+1)]
+                    cacheIt('lenColTwo', eachCol, a)
+                    for eachNum in a:
+                        updatePoss(eachNum, 'c'+str(eachCol), without)
 
-def lenBoxTwo(grid): ### To Do!!
+def lenBoxTwo():
     ''' 
     if two identical cells in box have len2: update box
     '''
-    pass
+    for boxNum in range(9):
+        box = boxList(boxNum)
+        for eachCell in box:
+            if len(eachCell) == 2:
+                a = eachCell #the pair cell
+                if box.count(a) == 2 and cacheCheck('lenBoxTwo', boxNum, a):
+                    x = box.index(a) #index of first pair
+                    without = [x, box.index(a, x+1)]
+                    cacheIt('lenBoxTwo', boxNum, a)
+                    for eachNum in a:
+                        updatePoss(eachNum, 'b'+str(boxNum), without)
 
 ########## and threes?, fours?, etc?
 
 ##############################################################################################################################################
 
-def lenRowTwoThree(grid): ### To Do!!
+def lenRowTwoThree(): ### To Do!!
     ''' 
     if not lenRowTwo()
     if len2 cel numbers in two identical len3 cells: remove 3rd from row
     if len3 cells in same box: remove 3rd from box
     '''
-    pass
+    for row in range(9):
+        for col in cell.POSS[row]:
+            if len(col) == 2 and cacheCheck('lenRowTwo', row, col):
+                a = col #the pair cell
+                for nextCol in cell.POSS[row]:
+                    if len(nextCol) == 3 and a[0] in nextCol and a[1] in nextCol:
+                        b = nextCol #the triple cell
+                        if cell.POSS[row].count(b) == 2 and cacheCheck('lenRowTwoThree', row, b):
+                            x = cell.POSS[row].index(b)
+                            y = cell.POSS[row].index(b, x+1)
+                            cacheIt('lenRowTwoThree', row, b)
+                            for eachTest in b:
+                                if eachTest not in a:
+                                    c = eachTest #the remaining number
+                            updatePoss(c, 'r'+str(row), [x,y])
+                            z = cell.POSS[row].index(a)
+                            for eachNum in a:
+                                updatePoss(eachNum, 'r'+str(row), [x,y,z])
+                            if x/3 == y/3:
+                                updatePoss(c, 'b'+str(rowColtoBox(row, x)), [(row/3*3+x%3),(row/3*3+y%3)])
+
 
 def lenColTwoThree(grid): ### To Do!!
     ''' 
@@ -314,46 +391,48 @@ def lenBoxTwoThree(grid): ### To Do!!
 
 ##############################################################################################################################################
 
-def looper(numberOfLoops):
-    for each in range(numberOfLoops):
-        for every in range(1,10):
-            numInRowOne(every, a)
-            numInColOne(every, a)
-            numInBoxOne(every, a)
-        lenCellOne(a)
-        lenRowTwo()
-        printGrid(a)
-        print
+def looper():
+    for every in range(1,10):
+        numInRowOne(every, exampleGrid)
+        numInColOne(every, exampleGrid)
+        numInBoxOne(every, exampleGrid)
+    lenCellOne(exampleGrid)
+    lenRowTwo()
+    lenColTwo()
+    lenBoxTwo()
+    lenRowTwoThree()
+    ''' 
+    print
+    for each in cell.POSS:
+        print each
+    print
+    '''
+    printGrid(exampleGrid)
+    print
 
 #### setup a sample puzzle ####
-a = gridInit()
+exampleGrid = gridInit()
 import examples
-examples.example3(a)
-makePoss(a)
-printGrid(a)
+examples.example3(exampleGrid)
+makePoss(exampleGrid)
+printGrid(exampleGrid)
 print
 ###############################
 
-''' 
+import copy
+
+count = 0
 while True:
-    checker = cell.POSS[:]
-    loopTwo(a)
-    loopOne(a)
+    checker = copy.deepcopy(cell.POSS)
+    looper()
     if cell.POSS == checker:
-        printGrid(a)
+        print str(count) + ' loops'
         break
+    count += 1
 
 print
-checkPossSpecial(a)
-'''
 for each in cell.POSS:
     print each
+
 print
-
-looper(5)
-
-for each in cell.POSS:
-    print each
-print
-
 print cell.THECACHE
