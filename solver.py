@@ -341,11 +341,59 @@ def lenBoxTwo():
                     for eachNum in a:
                         updatePoss(eachNum, 'b'+str(boxNum), without)
 
-########## and threes?, fours?, etc?
+def lenRowThree():
+    ''' 
+    if two identical cells in row have len2: update row
+    '''
+    for row in range(9):
+        for col in cell.POSS[row]:
+            if len(col) == 3:
+                a = col # the triple cell
+                if cell.POSS[row].count(a) == 3 and cacheCheck('lenRowThree', row, a):
+                    x = cell.POSS[row].index(a) # index of first triple
+                    y = cell.POSS[row].index(a, x+1)
+                    without = [x, y, cell.POSS[row].index(a,y+1)]
+                    cacheIt('lenRowThree', row, a)
+                    for eachNum in a:
+                        updatePoss(eachNum, 'r'+str(row), without)
+
+def lenColThree():
+    ''' 
+    if three identical cells in col have len3: update col
+    '''
+    for eachCol in range(9):
+        col = colList(eachCol)
+        for row in col:
+            if len(row) == 3:
+                a = row #the triple cell
+                if col.count(a) == 3 and cacheCheck('lenColThree', eachCol, a):
+                    x = col.index(a) #index of first triple
+                    y = col.index(a, x+1)
+                    without = [x, y, col.index(a, y+1)]
+                    cacheIt('lenColThree', eachCol, a)
+                    for eachNum in a:
+                        updatePoss(eachNum, 'c'+str(eachCol), without)
+
+def lenBoxThree():
+    ''' 
+    if three identical cells in box have len3: update box
+    '''
+    for boxNum in range(9):
+        box = boxList(boxNum)
+        for eachCell in box:
+            if len(eachCell) == 3:
+                a = eachCell #the triple cell
+                if box.count(a) == 3 and cacheCheck('lenBoxThree', boxNum, a):
+                    x = box.index(a) #index of first triple
+                    y = box.index(a, x+1)
+                    without = [x, y, box.index(a, y+1)]
+                    cacheIt('lenBoxThree', boxNum, a)
+                    for eachNum in a:
+                        updatePoss(eachNum, 'b'+str(boxNum), without)
 
 ##############################################################################################################################################
 
-def lenRowTwoThree(): ### To Do!!
+def lenRowTwoThree():
     ''' 
     if not lenRowTwo()
     if len2 cel numbers in two identical len3 cells: remove 3rd from row
@@ -391,6 +439,28 @@ def lenBoxTwoThree(grid): ### To Do!!
 
 ##############################################################################################################################################
 
+def numInRowInBox(): ### To do!!
+    ''' 
+    if number in row is only in box, remove from box
+    '''
+    for row in range(9):
+        for each in cell.POSS[row]:
+            pass
+
+def numInRowInBox(): ### To do!!
+    ''' 
+    if number in col is only in box, remove from box
+    '''
+    pass
+
+def numInBoxInLine(): ### To do!!
+    ''' 
+    if number in box is only in line, remove from line
+    '''
+    pass
+
+##############################################################################################################################################
+
 def looper():
     for every in range(1,10):
         numInRowOne(every, exampleGrid)
@@ -400,6 +470,9 @@ def looper():
     lenRowTwo()
     lenColTwo()
     lenBoxTwo()
+    lenRowThree()
+    lenColThree()
+    lenBoxThree()
     lenRowTwoThree()
     ''' 
     print
